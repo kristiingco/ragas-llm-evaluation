@@ -17,12 +17,11 @@ def llm_wrapper():
     return llm
 
 @pytest.fixture
-def get_data():
-    question = "How many articles are there for JAVA?"
-
+def get_data(request):
+    test_data = request.param
 
     response_dict = requests.post("https://rahulshettyacademy.com/rag-llm/ask", json={
-        "question": question,
+        "question": test_data["question"],
         "chat_history": []
     })
 
@@ -38,8 +37,8 @@ def get_data():
             retrieved_contexts.append(retrieved_docs[i]["page_content"])
 
     sample = SingleTurnSample(
-        user_input=question,
-        reference="23",
+        user_input=test_data["question"],
+        reference=test_data["reference"],
         response=answer,
         retrieved_contexts=retrieved_contexts
     )
