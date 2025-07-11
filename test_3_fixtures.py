@@ -1,10 +1,9 @@
 import pytest
 from ragas.metrics import LLMContextRecall
+from utils import load_test_data
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("get_data", [
-   { "question": "How many articles are there for JAVA?", "reference": "23"},
-], indirect=True)
+@pytest.mark.parametrize("get_data", load_test_data("test_3_fixtures.json"), indirect=True)
 async def test_context_recall(llm_wrapper, get_data):
     llm = llm_wrapper
     context_recall = LLMContextRecall(llm=llm)

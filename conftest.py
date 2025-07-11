@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from ragas import SingleTurnSample
 from compatible_chat_openai import CompatibleChatOpenAI
+from utils import get_llm_response
 
 # Load environment variables
 load_dotenv()
@@ -20,11 +21,7 @@ def llm_wrapper():
 def get_data(request):
     test_data = request.param
 
-    response_dict = requests.post("https://rahulshettyacademy.com/rag-llm/ask", json={
-        "question": test_data["question"],
-        "chat_history": []
-    })
-
+    response_dict = get_llm_response(test_data)
 
     response_json = response_dict.json()
     answer = response_json.get("answer", "")
