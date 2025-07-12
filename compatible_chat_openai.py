@@ -7,6 +7,14 @@ from typing import List, Any, Union, Optional
 
 class CompatibleChatOpenAI(ChatOpenAI):
     """A wrapper around ChatOpenAI that handles ragas compatibility issues"""
+    
+    def set_run_config(self, run_config):
+        """Set run configuration for ragas compatibility"""
+        # Store the run config for potential use
+        self._run_config = run_config
+        # This method is called by ragas but we don't need to do anything specific
+        pass
+    
     def _convert_to_message_lists(self, messages):
         if isinstance(messages, StringPromptValue):
             return [[HumanMessage(content=messages.text)]]

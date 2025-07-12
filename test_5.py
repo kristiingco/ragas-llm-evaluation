@@ -1,5 +1,6 @@
 import pytest
 import asyncio
+from ragas import evaluate, EvaluationDataset
 from ragas.metrics import ResponseRelevancy, FactualCorrectness
 from ragas.embeddings import LangchainEmbeddingsWrapper
 from langchain_openai import OpenAIEmbeddings
@@ -13,7 +14,17 @@ async def test_relevancy_factual(llm_wrapper,get_data):
     
     # Create metrics with embeddings for ResponseRelevancy
     metrics = [ResponseRelevancy(llm=llm_wrapper, embeddings=embeddings), FactualCorrectness(llm=llm_wrapper)]
-    sample = get_data
-    scores = await asyncio.gather(*[metric.single_turn_ascore(sample) for metric in metrics])
-    print(scores)
-    assert scores[0] > 0.8 and scores[1] > 0.8
+
+    dataset = EvaluationDataset([get_data])
+    results = evaluate(dataset=dataset, metrics=metrics)
+    
+    # Extract the first (and only) score from each result list
+    response_relevancy_score = results['answer_relevancy'][0]
+    factual_correctness_score = results['factual_correctness(mode=f1)'][0]
+    
+    print(f"Response Relevancy Score: {response_relevancy_score}")
+    print(f"Factual Correctness Score: {factual_correctness_score}")
+    
+    # Assert that both scores are above 0.8
+    assert response_relevancy_score > 0.8, f"Response relevancy score {response_relevancy_score} is not above 0.8"
+    assert factual_correctness_score > 0.8, f"Factual correctness score {factual_correctness_score} is not above 0.8"
